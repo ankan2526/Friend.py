@@ -1,40 +1,69 @@
 # Friend.py
 
-Friend.py is a Streamlit-based Python learning environment designed for beginners. It features a built-in code editor with syntax highlighting, an interactive chat-based tutor, and a sandboxed execution environment. 
+Friend.py is a beginner-friendly Python learning app built with Streamlit. It combines a structured curriculum, a built-in browser editor, a chat tutor, a quiz generator, and a sandboxed code runner to help someone learn Python step by step.
 
-It is designed to run locally using Ollama for 100% privacy and zero cost, but it can seamlessly fall back to the Groq API when deployed to the cloud (e.g., Render).
+The app is designed to work locally with Ollama for privacy and zero-cost inference, while automatically switching to Groq in cloud deployments such as Render.
 
 ## Features
-- **Local Inference First:** Uses `llama3.1:8b` and `qwen2.5-coder:7b` via Ollama for tutoring, code review, and quiz generation.
-- **Built-in IDE:** Write Python code directly in the browser using `streamlit-ace`.
-- **Sandboxed Execution:** Safely executes user code locally with a strict timeout and blocked words filter.
-- **Multi-Agent System:**
-  - **Tutor Agent:** Explains concepts patiently without giving away the exact code.
-  - **Reviewer Agent:** Analyzes code and output to provide hints.
-  - **Quizmaster Agent:** Generates context-aware multiple-choice questions.
+- **Structured curriculum** with lessons, challenges, and starter code for each Python topic
+- **Browser-based Python editor** using `streamlit-ace`
+- **Chat tutor** that explains concepts without giving away the exact answer
+- **Quiz generator** that produces topic-specific multiple-choice questions
+- **Code reviewer** that gives beginner-friendly hints after running code
+- **Sandboxed execution** with a short timeout and blocked unsafe imports
+- **Local-first AI** using Ollama, plus cloud fallback on Render
+
+## Local model setup
+When `RENDER` is not set, the application connects to the local Ollama OpenAI-compatible endpoint:
+- `http://localhost:11434/v1`
+
+The app currently uses:
+- Tutor and quiz generation: `llama3.1:8b`
+- Code review: `qwen2.5-coder:7b`
+
+If you are running on Render, the app switches to Groq using:
+- `https://api.groq.com/openai/v1`
+- environment variable: `GROQ_API_KEY`
 
 ## Setup
 
-### 1. Install Dependencies
+### 1. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run Locally (Ollama)
-Ensure you have [Ollama](https://ollama.com/) installed and running on your machine.
-Pull the required models:
+### 2. Start Ollama locally
+Install and run [Ollama](https://ollama.com/) then pull the required models:
 ```bash
-ollama run llama3.1:8b
-ollama run qwen2.5-coder:7b
+ollama pull llama3.1:8b
+ollama pull qwen2.5-coder:7b
 ```
 
-Run the application:
+### 3. Run the app
 ```bash
 streamlit run app.py
 ```
 
-### 3. Deploy to Render
-This project is configured to automatically fall back to Groq when deployed on Render.
-1. Set the environment variable `RENDER=true` (this is usually auto-set by Render).
-2. Set your Groq API key as an environment variable: `GROQ_API_KEY=your_key_here`.
-3. Render Start Command: `streamlit run app.py --server.port $PORT --server.address 0.0.0.0`
+## Render deployment
+This project is configured to auto-detect Render and use the Groq API instead of the local Ollama endpoint.
+
+Required environment variables:
+```bash
+RENDER=true
+GROQ_API_KEY=your_key_here
+```
+
+Start command:
+```bash
+streamlit run app.py --server.port $PORT --server.address 0.0.0.0
+```
+
+## Running tests
+```bash
+pytest
+```
+
+## Notes
+- The app executes submitted code in a temporary Python file with a 3-second timeout.
+- Unsafe code containing imports such as `os`, `sys`, or `subprocess` is blocked by design.
+- The project is intentionally designed for a beginner-friendly learning flow without requiring a paid AI provider for local use.
