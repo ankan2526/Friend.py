@@ -2,3 +2,4 @@ streamlit
 openai
 streamlit-ace
 python-dotenv
+pytest
